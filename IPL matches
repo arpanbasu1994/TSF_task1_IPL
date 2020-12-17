@@ -1,0 +1,39 @@
+getwd()
+setwd("F:\\TSF_Internship")
+setwd(choose.dir())
+matches<-read.csv("matches.csv")
+global_terror <- read.csv("global_terror.csv")
+
+library(sqldf)
+ sqldf("select count(distinct(winner))
+      from matches")
+
+
+number_of_wins<-table(matches$winner)
+number_of_wins<-data.frame(number_of_wins)
+number_of_wins<-arrange(number_of_wins, desc(Freq))
+library(dplyr)
+
+succ_player<- data.frame(table(matches$player_of_match))
+succ_player<-arrange(succ_player, desc(Freq))
+
+toss<-data.frame(table(matches$toss_winner))
+toss<-arrange(toss, desc(Freq))
+colnames(number_of_wins)[2] <- "wins"
+colnames(toss)[2] <- "toss_won"
+
+reg1<-sqldf("select number_of_wins.Var1, number_of_wins.wins, toss.Var1, toss.toss_won
+      from number_of_wins, toss
+      where number_of_wins.Var1=toss.Var1")
+
+
+lm(reg1$wins~reg1$toss_won)
+summary(lm(reg1$wins~reg1$toss_won))
+
+count(matches$win_by_runs)
+nrow(matches[matches$id==1])
+
+wins_by_wicket<-sqldf("select count(win_by_runs)
+      from matches
+      where win_by_runs = 0")
+wins_by_runs<-756-419
